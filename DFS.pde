@@ -25,14 +25,14 @@ boolean finished;
 void setup()
 {
   
-   size(800, 800);
+   size(800, 805);
    background(255);
    target_identified = false;
    start_identified = false;
    clicked = false;
    finished = false;
    found = false;
-   w = width / rows;
+   w = width / rows - 5;
    h = height / cols;
    grid = new Cell[rows][cols];
    randomize_walls();
@@ -42,81 +42,62 @@ void setup()
    s = new Stack<Cell>(); 
    
 }
-int screenState = 0;
-final int menuScreen = 0;
-final int bfsScreen = 1;
+
 
 void draw()
 {
-    if(screenState == menuScreen)
-    {
-       
-       drawMenu();
-    }
-    else if(screenState == bfsScreen)
-    {
-       drawDFS(); 
-    }
-  
-  
-  
-}
-void drawMenu()
-{
-   
-   
-   background(255);
-   fill(0);
-   textSize(32);
-   text(" MAZE SOLVER USING DEPDTH FIRST SEARCH \n", 50, 200);
-   textSize(22);
-   text("First Choose a Cell to be the Start Cell,\n"+
-        "Then Choose another to be the Target Cell",100, 300);
-   
-   display("START");
-  
-}
-
-
-void drawDFS()
-{
-  
+  if(keyPressed)
+      {
+         if(key == ' ')
+         {
+           setup();
+         }
+         if(key == '\n')
+         {
+           exit();  
+         }
+      }
   if(!clicked && mousePressed && !start_identified)
   {
      start_i = mouseY / w;
      start_j = mouseX / h;
       
-     start_identified = true;
-     root = grid[start_i][start_j];
-     
-     if(root.wall)
-     {
-        start_identified = false;
-        clicked = false;
-     }  
-     else
-     {
-       root.parent = null;
-       root.setVisited(true);
-       root.col = color(0, 255, 0);
-       s.push(root);
+     if(start_i < rows &&  start_j < cols)
+     { 
+       start_identified = true;
+       root = grid[start_i][start_j];
+       
+       if(root.wall)
+       {
+          start_identified = false;
+          clicked = false;
+       }  
+       else
+       {
+         root.parent = null;
+         root.setVisited(true);
+         root.col = color(0, 255, 0);
+         s.push(root);
+       }
      }
-     println(start_i);
-     println(start_j);  
+       
   }
   else if(clicked && mousePressed && !target_identified)
   {
     target_i = mouseY / w;
     target_j = mouseX / h;
-    target_identified = true;
-    end = grid[target_i][target_j];
     
-    if(end.wall) 
-      target_identified = false;
-    else
-      end.col = color(255, 0, 0);
-    println(target_i);
-    println(target_j);
+    if(start_i < rows &&  start_j < cols)
+    {
+      target_identified = true;
+      end = grid[target_i][target_j];
+      
+      if(end.wall) 
+        target_identified = false;
+      else
+        end.col = color(255, 0, 0);
+      
+    }
   }
   
   if(start_identified && target_identified)
@@ -157,9 +138,10 @@ void drawDFS()
     
   }
   
+  fill(0);
+  textSize(20);
+  text("Choose the starting cell, then the end cell.\nPress SPACE to start again.\nPress ENTER to exit.", 10, 722);
   show();
-  if(finished)
-      display("AGAIN");
   
 }
 
@@ -226,31 +208,6 @@ void randomize_walls()
    }
    
 }
-void display(String msg)
-{
-       delay(100);
-       float x = 300;
-       float y = 400;
-       float w = 120;
-       float h = 80;
-       fill(255);
-       rect(300, 400,w,h);
-       fill(0);
-       textSize(26);
-       text(msg,320, 450);
-       
-       if(mousePressed)
-       {
-          if(mouseX>x && mouseX <x+w && mouseY>y && mouseY <y+h)
-          {
-             fill(0);
-             finished = false;
-             setup();
-             screenState = bfsScreen;
-          } 
-       }
-}
-  
 void mouseClicked()
 {
   if(!clicked && start_identified)
